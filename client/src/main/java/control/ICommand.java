@@ -1,5 +1,7 @@
 package control;
 
+import model.Participant;
+
 public interface ICommand {
-    void execute();
+    void execute(Participant participant);
 }

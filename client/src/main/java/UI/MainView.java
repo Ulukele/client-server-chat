@@ -7,7 +7,7 @@ public class MainView extends JFrame {
     private ChatPanel chatPanel;
 
     public MainView() {
-        super("Super-Chat");
+        super("Super-common.Chat");
 
 
         chatPanel = new ChatPanel();

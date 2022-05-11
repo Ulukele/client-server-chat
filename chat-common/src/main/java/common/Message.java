@@ -1,3 +1,7 @@
+package common;
+
+import common.User;
+
 import java.time.LocalDateTime;
 
 public class Message {

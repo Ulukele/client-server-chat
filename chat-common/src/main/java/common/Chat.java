@@ -1,3 +1,7 @@
+package common;
+
+import common.User;
+
 import java.util.List;
 
 public class Chat {
