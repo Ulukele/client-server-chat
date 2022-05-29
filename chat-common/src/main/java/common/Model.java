@@ -1,5 +1,5 @@
 package common;
 
-public interface Model<T> {
+public interface Model<T> extends IPublisher {
     T getData();
 }
