@@ -1,13 +1,16 @@
 package common;
 
-import common.User;
-
 import java.time.LocalDateTime;
 
 public class Message {
     private User sender;
     private String text;
     private LocalDateTime dateTime;
+
+    public Message(User sender, String text) {
+        this.sender = sender;
+        this.text = text;
+    }
 
     public User getSender() {
         return sender;
