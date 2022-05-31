@@ -26,8 +26,9 @@ public class ChatPanel extends JPanel implements ISubscriber {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
     }
 
-    private void addModel(Model<Chat> chatModel) {
+    public void addModel(Model<Chat> chatModel) {
         this.chatModel = chatModel;
+        chatModel.addSubscriber(this);
     }
 
     public void addMessage(MessagePanel messagePanel) {

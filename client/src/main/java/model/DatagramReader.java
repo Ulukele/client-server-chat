@@ -26,7 +26,6 @@ public class DatagramReader {
             int readSuccessfully = inputStream.read(datagram, readLength, datagramLength - readLength);
             readLength += readSuccessfully;
         }
-
         return datagram;
     }
 }

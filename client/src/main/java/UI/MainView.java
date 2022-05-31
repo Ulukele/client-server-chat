@@ -1,15 +1,21 @@
 package UI;
 
 import common.ClientConfiguration;
+import common.ISubscriber;
+import common.Model;
 import control.Control;
+import model.NotificationsData;
+import model.Participant;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class MainView extends JFrame {
+public class MainView extends JFrame implements ISubscriber {
 
     private final ChatPanel chatPanel;
     private Control control;
+
+    private Model<String> infoManager;
 
     private final ClientConfiguration configuration;
     private final ChatTextField chatTextField;
@@ -69,7 +75,15 @@ public class MainView extends JFrame {
         sendMessageButton.connectControl(control);
     }
 
-    public void connectModels() {
+    public void connectModels(Participant participant, NotificationsData notificationsData) {
+        chatPanel.addModel(participant);
+        infoManager = notificationsData;
+        infoManager.addSubscriber(this);
+    }
 
+    @Override
+    public void reactOnNotify() {
+        if (infoManager == null) return;
+        JOptionPane.showMessageDialog(this, infoManager.getData());
     }
 }

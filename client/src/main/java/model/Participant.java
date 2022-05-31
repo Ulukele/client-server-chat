@@ -72,6 +72,10 @@ public class Participant extends Publisher implements Model<Chat> {
         publishNotify();
     }
 
+    public NotificationsData getNotificationsData() {
+        return notificationsData;
+    }
+
     @Override
     public Chat getData() {
         return chat;

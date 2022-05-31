@@ -1,7 +1,6 @@
 package model;
 
 import common.Address;
-import utils.IEventsParser;
 
 import java.io.*;
 import java.net.Socket;
