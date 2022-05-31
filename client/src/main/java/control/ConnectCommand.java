@@ -1,6 +1,7 @@
 package control;
 
 import common.Address;
+import exceptions.ConnectionException;
 import model.Participant;
 
 import java.io.IOException;
@@ -15,7 +16,7 @@ public class ConnectCommand implements IUnsafeCommand {
     }
 
     @Override
-    public void execute(Participant participant) throws IOException {
+    public void execute(Participant participant) throws ConnectionException {
         participant.makeConnection(address, userName);
     }
 }

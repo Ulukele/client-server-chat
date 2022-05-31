@@ -1,20 +1,18 @@
 package UI;
 
-import common.Chat;
-import common.ClientConfiguration;
-import common.ISubscriber;
-import common.Model;
+import common.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayDeque;
+import java.util.List;
 import java.util.Queue;
 
 public class ChatPanel extends JPanel implements ISubscriber {
 
     private final ClientConfiguration configuration;
 
-    private final Queue<MessagePanel> messagePanels = new ArrayDeque<>();
+//    private final Queue<MessagePanel> messagePanels = new ArrayDeque<>();
     private final int maxMessages;
     private Model<Chat> chatModel;
 
@@ -39,16 +37,21 @@ public class ChatPanel extends JPanel implements ISubscriber {
         messagePanel.getText().setForeground(appColor.darker());
 
         add(messagePanel);
-        if (messagePanels.size() >= maxMessages) {
-            MessagePanel lastMessage = messagePanels.poll();
-            remove(lastMessage);
-        }
-        messagePanels.add(messagePanel);
+//        if (messagePanels.size() >= maxMessages) {
+//            MessagePanel lastMessage = messagePanels.poll();
+//            remove(lastMessage);
+//        }
+//        messagePanels.add(messagePanel);
     }
 
     @Override
     public void reactOnNotify() {
         Chat chat = chatModel.getData();
-        // TODO load messages
+        removeAll();
+        List<Message> messages = chat.getMessages().subList(0, maxMessages);
+
+        for (final Message message : messages) {
+            addMessage(new MessagePanel(message.getText(), message.getSender().getName()));
+        }
     }
 }

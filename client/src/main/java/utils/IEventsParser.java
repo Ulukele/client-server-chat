@@ -1,9 +1,8 @@
 package utils;
 
 import control.ICommand;
-
-import java.io.IOException;
+import exceptions.DataParsingException;
 
 public interface IEventsParser {
-    ICommand parseEvent(byte[] eventData) throws IOException;
+    ICommand parseEvent(byte[] eventData) throws DataParsingException;
 }
