@@ -1,4 +1,4 @@
-package model;
+package utils;
 
 import common.Address;
 
@@ -20,8 +20,16 @@ public class Client {
         this.eventsManager = eventsManager;
         eventLoop = Executors.newSingleThreadExecutor();
         datagramReader = new DatagramReader();
+    }
+
+    public void connect(Address address) throws IOException {
+        socket = new Socket(address.getAddress(), address.getPort());
+        // TODO create output stream
+        inputStream = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+        datagramReader.setInputStream(inputStream);
 
         // Processing events from server
+        eventLoop.shutdown();
         eventLoop.submit(new Runnable() {
             @Override
             public void run() {
@@ -35,13 +43,6 @@ public class Client {
                 }
             }
         });
-    }
-
-    public void connect(Address address) throws IOException {
-        socket = new Socket(address.getAddress(), address.getPort());
-        // TODO create output stream
-        inputStream = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-        datagramReader.setInputStream(inputStream);
     }
 
     public void send(String data) throws IOException {

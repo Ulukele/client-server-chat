@@ -1,7 +1,6 @@
 package common;
 
 import exceptions.LoadConfigurationException;
-import model.Client;
 
 import java.awt.*;
 import java.io.IOException;

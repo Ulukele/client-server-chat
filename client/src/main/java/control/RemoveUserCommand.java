@@ -4,7 +4,7 @@ import common.User;
 import model.Participant;
 
 public class RemoveUserCommand implements ICommand {
-    private User user;
+    private final User user;
 
     public RemoveUserCommand(User user) {
         this.user = user;
@@ -12,6 +12,6 @@ public class RemoveUserCommand implements ICommand {
 
     @Override
     public void execute(Participant participant) {
-        participant.removeUser(user);
+        participant.removeUser(user); // TODO remove equal by name
     }
 }

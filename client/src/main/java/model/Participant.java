@@ -3,6 +3,8 @@ package model;
 import common.*;
 import control.Control;
 import exceptions.ConnectionException;
+import utils.Client;
+import utils.EventsManager;
 import utils.XMLEventsParser;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -15,9 +17,14 @@ public class Participant extends Publisher implements Model<Chat> {
     private Client client;
     private int sessionId;
 
-    private final NotificationsData notificationsData = new NotificationsData();
+    private final ParticipantStateManager stateManager;
+    private final NotificationsManager notificationsManager;
 
-    public Participant() {}
+    public Participant(ParticipantStateManager stateManager, NotificationsManager notificationsManager) {
+        this.stateManager = stateManager;
+        stateManager.setParticipantState(ParticipantState.WAITS_ADDRESS);
+        this.notificationsManager = notificationsManager;
+    }
 
     public void makeConnection(Address address, String userName) throws ConnectionException {
         EventsManager eventsManager;
@@ -38,7 +45,13 @@ public class Participant extends Publisher implements Model<Chat> {
         user = new User(userName);
     }
 
-    public void addMessage(String message) {
+    public void receiveMessage(Message message) {
+        if (chat == null || user == null) return;
+        chat.addMessage(message);
+        publishNotify();
+    }
+
+    public void addSelfMessage(String message) {
         if (chat == null || user == null) return;
         Message messageObj = new Message(user, message);
         chat.addMessage(messageObj);
@@ -64,7 +77,7 @@ public class Participant extends Publisher implements Model<Chat> {
     }
 
     public void notifyClient(String messageToDisplay) {
-        notificationsData.addNotification(messageToDisplay);
+        notificationsManager.addNotification(messageToDisplay);
     }
 
     public void setSessionId(int sessionId) {
@@ -72,8 +85,8 @@ public class Participant extends Publisher implements Model<Chat> {
         publishNotify();
     }
 
-    public NotificationsData getNotificationsData() {
-        return notificationsData;
+    public NotificationsManager getNotificationsData() {
+        return notificationsManager;
     }
 
     @Override

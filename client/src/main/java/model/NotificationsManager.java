@@ -6,7 +6,7 @@ import common.Publisher;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NotificationsData extends Publisher implements Model<String> {
+public class NotificationsManager extends Publisher implements Model<String> {
     private final List<String> notifications = new ArrayList<>();
 
     public void addNotification(String messageToDisplay) {

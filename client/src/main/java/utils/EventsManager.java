@@ -1,11 +1,8 @@
-package model;
+package utils;
 
 import control.Control;
 import control.ICommand;
 import exceptions.DataParsingException;
-import utils.IEventsParser;
-
-import java.io.IOException;
 
 public class EventsManager {
     private final IEventsParser eventsParser;

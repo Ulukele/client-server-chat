@@ -1,18 +1,22 @@
 import UI.MainView;
-import common.Address;
 import common.ClientConfiguration;
 import control.Control;
-import exceptions.ConnectionException;
 import exceptions.LoadConfigurationException;
-import model.NotificationsData;
+import model.NotificationsManager;
 import model.Participant;
+import model.ParticipantStateManager;
 
 import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) {
-        Participant participant = new Participant();
-        NotificationsData notificationsData = participant.getNotificationsData();
+
+        ParticipantStateManager participantStateManager = new ParticipantStateManager();
+        NotificationsManager notificationsManager = new NotificationsManager();
+        Participant participant = new Participant(
+                participantStateManager,
+                notificationsManager
+        );
         Control control = new Control(participant);
 
         ClientConfiguration configuration = new ClientConfiguration("config.properties");
@@ -24,9 +28,9 @@ public class Main {
 
         MainView app = new MainView(configuration);
         SwingUtilities.invokeLater(() -> {
-            app.connectControl(control);
-            app.connectModels(participant, notificationsData);
             app.setVisible(true);
+            app.connectControl(control);
+            app.connectModels(participant, participantStateManager, notificationsManager);
         });
     }
 }

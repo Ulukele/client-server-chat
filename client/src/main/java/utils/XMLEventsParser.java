@@ -1,10 +1,8 @@
 package utils;
 
+import common.Message;
 import common.User;
-import control.AddUsersCommand;
-import control.ErrorCommand;
-import control.ICommand;
-import control.SuccessCommand;
+import control.*;
 import exceptions.DataParsingException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -28,8 +26,64 @@ public class XMLEventsParser implements IEventsParser {
         documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
     }
 
+    public User parseUserFromEvent(Element eventElement) {
+        NodeList namesList = eventElement.getElementsByTagName("name");
+        if (namesList.getLength() != 1) return null;
+
+        Node nameNode = namesList.item(0);
+        if (nameNode.getNodeType() != Node.ELEMENT_NODE) return null;
+
+        Element nameElement = (Element) nameNode;
+
+        String name = nameElement.getTextContent();
+        return new User(name);
+    }
+
+    private Message parseMessageFromEvent(Element eventElement) {
+        NodeList messagesList =  eventElement.getElementsByTagName("message");
+        NodeList namesList = eventElement.getElementsByTagName("name");
+        if (messagesList.getLength() != 1 || namesList.getLength() != 1) return null;
+
+        Node messageNode = messagesList.item(0);
+        Node nameNode = namesList.item(0);
+        if (messageNode.getNodeType() != Node.ELEMENT_NODE || nameNode.getNodeType() != Node.ELEMENT_NODE) return null;
+
+        Element messageElement = (Element) messageNode;
+        Element nameElement = (Element) nameNode;
+
+        String message = messageElement.getTextContent();
+        String name = nameElement.getTextContent();
+        return new Message(new User(name), message);
+    }
+
     private ICommand parseServerEvent(Element root) throws DataParsingException {
-        return null;
+        NodeList eventList = root.getElementsByTagName("event");
+        if (eventList.getLength() != 1) throw new DataParsingException();
+
+        Node eventNode = eventList.item(0);
+        if (eventNode.getNodeType() != Node.ELEMENT_NODE) throw new DataParsingException();
+
+        Element eventElement = (Element) eventNode;
+        String name = eventElement.getAttribute("name");
+
+        ICommand command = null;
+        if (name.equals("user-login")) {
+            User user = parseUserFromEvent(eventElement);
+            if (user == null) throw new DataParsingException();
+            command = new AddUsersCommand(user);
+        } else if (name.equals("user-logout")) {
+            User user = parseUserFromEvent(eventElement);
+            if (user == null) throw new DataParsingException();
+            command = new RemoveUserCommand(user);
+        } else if (name.equals("message")) {
+            Message message = parseMessageFromEvent(eventElement);
+            if (message == null) throw new DataParsingException();
+            command = new MessageCommand(message);
+        } else {
+            throw new DataParsingException();
+        }
+
+        return command;
     }
 
     private List<User> getUsersFromServerMessage(Element root) {

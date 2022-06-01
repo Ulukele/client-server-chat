@@ -5,14 +5,14 @@ import model.Participant;
 
 public class MessageCommand implements ICommand {
 
-    private final String message;
+    private final Message message;
 
-    public MessageCommand(String message) {
+    public MessageCommand(Message message) {
         this.message = message;
     }
 
     @Override
     public void execute(Participant participant) {
-        participant.addMessage(message);
+        participant.receiveMessage(message);
     }
 }
