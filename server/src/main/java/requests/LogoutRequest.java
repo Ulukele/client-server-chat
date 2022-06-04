@@ -11,6 +11,6 @@ public class LogoutRequest implements IRequest {
 
     @Override
     public void react(Server server) {
-        // TODO react
+        server.RemoveUser(sessionId);
     }
 }

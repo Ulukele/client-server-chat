@@ -1,18 +1,19 @@
 package requests;
 
 import common.User;
-import requests.IRequest;
 import server.Server;
 
 public class LoginRequest implements IRequest {
-    private User user;
+    private final User user;
+    private final int sessionId;
 
-    public LoginRequest(User user) {
+    public LoginRequest(int sessionId, User user) {
+        this.sessionId = sessionId;
         this.user = user;
     }
 
     @Override
     public void react(Server server) {
-        // TODO react
+        server.AddUser(sessionId, user);
     }
 }

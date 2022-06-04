@@ -24,4 +24,8 @@ class PropertiesParser {
     public int getInteger(String key) throws NullPointerException, NumberFormatException {
         return Integer.parseInt(getString(key));
     }
+
+    public boolean getBoolean(String key) throws NullPointerException {
+        return Boolean.parseBoolean(getString(key));
+    }
 }

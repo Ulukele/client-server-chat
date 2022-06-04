@@ -21,10 +21,15 @@ import java.io.IOException;
 
 public class XMLRequestParser implements IRequestParser {
 
+    private int sessionId;
     private final DocumentBuilder documentBuilder;
 
     public XMLRequestParser() throws ParserConfigurationException {
         documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+    }
+
+    public void setSessionId(int sessionId) {
+        this.sessionId = sessionId;
     }
 
     private String parseStrFromTag(Element root, String tagName) {
@@ -62,7 +67,7 @@ public class XMLRequestParser implements IRequestParser {
         if (name.equals("login")) {
             String userName = parseUserName(root);
             if (userName == null) throw new RequestParsingException();
-            return new LoginRequest(new User(userName));
+            return new LoginRequest(sessionId, new User(userName));
         } else if (name.equals("logout")) {
             Integer sessionId = parseSessionId(root);
             if (sessionId == null) throw new RequestParsingException();
