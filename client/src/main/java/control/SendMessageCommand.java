@@ -12,7 +12,6 @@ public class SendMessageCommand implements ICommand {
 
     @Override
     public void execute(Participant participant) {
-        System.out.println(messageText);
-        // TODO send message
+        participant.sendMessage(messageText);
     }
 }

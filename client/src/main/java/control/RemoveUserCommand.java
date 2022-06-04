@@ -12,6 +12,6 @@ public class RemoveUserCommand implements ICommand {
 
     @Override
     public void execute(Participant participant) {
-        participant.removeUser(user); // TODO remove equal by name
+        participant.removeUser(user);
     }
 }

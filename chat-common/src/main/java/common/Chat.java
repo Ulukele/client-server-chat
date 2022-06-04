@@ -24,6 +24,8 @@ public class Chat {
     }
 
     public void removeUser(User user) {
-        users.remove(user);
+        for (final User oneUser : users) {
+            if (oneUser.getName().equals(user.getName())) users.remove(user);
+        }
     }
 }

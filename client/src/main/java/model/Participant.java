@@ -3,11 +3,8 @@ package model;
 import common.*;
 import control.Control;
 import exceptions.ConnectionException;
-import utils.Client;
-import utils.EventsManager;
-import utils.XMLEventsParser;
+import utils.*;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.util.List;
 
@@ -19,30 +16,39 @@ public class Participant extends Publisher implements Model<Chat> {
 
     private final ParticipantStateManager stateManager;
     private final NotificationsManager notificationsManager;
+    private final IRequestBuilder requestBuilder;
+    private final EventsManager eventsManager;
 
-    public Participant(ParticipantStateManager stateManager, NotificationsManager notificationsManager) {
+    public Participant(
+            ParticipantStateManager stateManager,
+            NotificationsManager notificationsManager,
+            IRequestBuilder requestBuilder,
+            IEventsParser eventsParser
+    ) {
         this.stateManager = stateManager;
         stateManager.setParticipantState(ParticipantState.WAITS_ADDRESS);
         this.notificationsManager = notificationsManager;
+        this.requestBuilder = requestBuilder;
+        eventsManager = new EventsManager(eventsParser, new Control(this));
+    }
+
+    public void closeCurrentConnection() throws IOException {
+        if (stateManager.getParticipantState() != ParticipantState.CONNECTED) return;
+        client.send(requestBuilder.buildDisconnect());
+        stateManager.setParticipantState(ParticipantState.WAITS_ADDRESS);
     }
 
     public void makeConnection(Address address, String userName) throws ConnectionException {
-        EventsManager eventsManager;
-        try {
-            eventsManager = new EventsManager(new XMLEventsParser(), new Control(this));
-        } catch (ParserConfigurationException exception) {
-            throw new ConnectionException("Unable to configure XML parser");
-        }
+        user = new User(userName);
+        chat = new Chat();
 
         try {
             client = new Client(eventsManager);
             client.connect(address);
+            client.send(requestBuilder.buildConnect(user));
         } catch (IOException ioException) {
             throw new ConnectionException("Unable to connect to such host");
         }
-
-        chat = new Chat();
-        user = new User(userName);
     }
 
     public void receiveMessage(Message message) {
@@ -51,10 +57,14 @@ public class Participant extends Publisher implements Model<Chat> {
         publishNotify();
     }
 
-    public void addSelfMessage(String message) {
+    public void sendMessage(String message) {
         if (chat == null || user == null) return;
         Message messageObj = new Message(user, message);
-        chat.addMessage(messageObj);
+        try {
+            client.send(requestBuilder.buildSendMessage(messageObj));
+        } catch (IOException exception) {
+            notificationsManager.addNotification("Error while sending message");
+        }
         publishNotify();
     }
 
@@ -82,7 +92,8 @@ public class Participant extends Publisher implements Model<Chat> {
 
     public void setSessionId(int sessionId) {
         this.sessionId = sessionId;
-        publishNotify();
+        stateManager.setParticipantState(ParticipantState.CONNECTED);
+        requestBuilder.setSessionId(sessionId);
     }
 
     public NotificationsManager getNotificationsData() {

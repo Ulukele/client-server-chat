@@ -1,7 +1,5 @@
 package utils;
 
-import control.ICommand;
-
 import java.io.DataInputStream;
 import java.io.IOException;
 
@@ -27,5 +25,9 @@ public class DatagramReader {
             readLength += readSuccessfully;
         }
         return datagram;
+    }
+
+    synchronized public boolean haveData() throws IOException {
+        return inputStream.available() > 0;
     }
 }

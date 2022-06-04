@@ -4,8 +4,6 @@ import common.Address;
 import exceptions.ConnectionException;
 import model.Participant;
 
-import java.io.IOException;
-
 public class ConnectCommand implements IUnsafeCommand {
     private final Address address;
     private final String userName;

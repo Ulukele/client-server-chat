@@ -14,8 +14,8 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="chat-common" options="--add-modules java.base" />
-      <module name="client" options="--add-modules java.base" />
+      <module name="chat-common" options="" />
+      <module name="client" options="" />
     </option>
   </component>
 </project>
