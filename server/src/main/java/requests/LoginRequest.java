@@ -14,6 +14,6 @@ public class LoginRequest implements IRequest {
 
     @Override
     public void react(Server server) {
-        server.AddUser(sessionId, user);
+        server.addUser(sessionId, user);
     }
 }

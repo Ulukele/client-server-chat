@@ -19,7 +19,7 @@ public class EventsManager {
             ICommand command = eventsParser.parseEvent(event);
             control.execute(command);
         } catch (DataParsingException exception) {
-            exception.printStackTrace(); // TODO Logging
+            exception.printStackTrace();
         }
     }
 }

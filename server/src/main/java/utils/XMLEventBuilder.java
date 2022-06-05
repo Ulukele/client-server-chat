@@ -35,7 +35,14 @@ public class XMLEventBuilder implements IEventBuilder {
 
     @Override
     public byte[] buildListUsers(List<User> users) {
-        return new byte[0];
+        StringBuilder usersList = new StringBuilder();
+        for (final User user : users) {
+            usersList.append("<user><name>");
+            usersList.append(user.getName());
+            usersList.append("</name></user>");
+        }
+        String event = "<success><list-users>" + usersList + "</list-users></success>";
+        return event.getBytes();
     }
 
     @Override

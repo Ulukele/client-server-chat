@@ -11,18 +11,20 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class Server {
     private final int port;
     private final boolean logging;
     private final int maxClients;
+    private final int maxMessages;
     private int clientsCount;
     private final IEventBuilder eventBuilder;
     private final Map<Integer, RequestProcessor> requestProcessorMap = new HashMap<>();
     private final Logger logger = Logger.getLogger(Server.class.getName());
+
+    private final Queue<Message> messageQueue;
 
     private void logInfo(String message) {
         if (!logging) return;
@@ -33,12 +35,22 @@ public class Server {
         this.port = configuration.getPort();
         this.logging = configuration.isLog();
         this.maxClients = configuration.getMaxClients();
+        this.maxMessages = configuration.getMaxMessages();
         this.clientsCount = 0;
         this.eventBuilder = eventBuilder;
+        messageQueue = new ArrayDeque<>(maxMessages);
+
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                checkProcessors();
+            }
+        }, 0, 6000);
     }
 
     public void start() throws IOException, ParserConfigurationException {
-        ServerSocket serverSocket = new ServerSocket(port);
+        ServerSocket serverSocket = new ServerSocket(port, maxClients);
 
         logInfo(
                 "Start server on " +
@@ -58,10 +70,17 @@ public class Server {
                     sessionId,
                     clientSocket,
                     requestParser,
-                    new ResponseExecutor(this)
+                    new ResponseExecutor(this),
+                    60L
             );
             requestProcessorMap.put(sessionId, requestProcessor);
             requestProcessor.startResponse();
+        }
+    }
+
+    private void checkProcessors() {
+        for (final int sessionId : requestProcessorMap.keySet()) {
+            requestProcessorMap.get(sessionId).checkAlive();
         }
     }
 
@@ -82,14 +101,17 @@ public class Server {
         }
     }
 
-    public void AddUser(int sessionId, User user) {
+    public void addUser(int sessionId, User user) {
         requestProcessorMap.get(sessionId).setUser(user);
         sendForSession(sessionId, eventBuilder.buildSuccessLogin(sessionId));
+        for (final Message message : messageQueue) {
+            sendForSession(sessionId, eventBuilder.buildAddMessage(message));
+        }
         broadcastData(eventBuilder.buildAddUser(user));
         logInfo("Add " + user + " with sessionID=" + sessionId);
     }
 
-    public void RemoveUser(int sessionId) {
+    public void removeUser(int sessionId) {
         RequestProcessor requestProcessor = requestProcessorMap.get(sessionId);
         User user = requestProcessor.getUser();
         requestProcessorMap.remove(sessionId);
@@ -100,6 +122,10 @@ public class Server {
 
     public void addMessage(Message message) {
         if (message.isEmpty()) return;
+        if (messageQueue.size() >= maxMessages) {
+            messageQueue.poll();
+        }
+        messageQueue.add(message);
         broadcastData(eventBuilder.buildAddMessage(message));
         logInfo("Add message " + message);
     }

@@ -2,7 +2,6 @@ package common;
 
 import exceptions.LoadConfigurationException;
 
-import java.awt.*;
 import java.io.IOException;
 
 public class ServerConfiguration {
@@ -10,9 +9,11 @@ public class ServerConfiguration {
     private boolean log;
     private int port;
 
-    private final String filename;
-    private PropertiesParser propertiesParser;
+    private int maxMessages;
 
+    private final String filename;
+
+    private PropertiesParser propertiesParser;
     public ServerConfiguration(String filename) {
         this.filename = filename;
     }
@@ -34,10 +35,12 @@ public class ServerConfiguration {
         maxClients = 2;
         log = true;
         port = 8080;
+        maxMessages = 10;
     }
 
     private void configureFromProperties() throws LoadConfigurationException {
         try {
+            maxMessages = propertiesParser.getInteger("MAX_MESSAGES");
             maxClients = propertiesParser.getInteger("MAX_CLIENTS");
             log = propertiesParser.getBoolean("LOG");
             port = propertiesParser.getInteger("PORT");
@@ -57,5 +60,9 @@ public class ServerConfiguration {
 
     public int getPort() {
         return port;
+    }
+
+    public int getMaxMessages() {
+        return maxMessages;
     }
 }
