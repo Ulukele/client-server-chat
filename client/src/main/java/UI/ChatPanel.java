@@ -7,7 +7,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
-import java.awt.*;
 import java.util.List;
 
 public class ChatPanel extends JScrollPane implements ISubscriber {
@@ -35,7 +34,7 @@ public class ChatPanel extends JScrollPane implements ISubscriber {
 
         senderSet = new SimpleAttributeSet();
         StyleConstants.setFontSize(senderSet, 17);
-        StyleConstants.setForeground(senderSet, configuration.getAppMessageColor().darker());
+        StyleConstants.setForeground(senderSet, configuration.getAppMessageColor().brighter());
         textSet = new SimpleAttributeSet();
         StyleConstants.setFontSize(textSet, 17);
         StyleConstants.setForeground(textSet, configuration.getAppMessageColor());

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Chat {
-    private final List<User> users = new ArrayList<>();
+    private List<User> users = new ArrayList<>();
 
     private final List<Message> messages = new ArrayList<>();
 
@@ -21,12 +21,14 @@ public class Chat {
     }
 
     public void addUsers(List<User> users) {
-        this.users.addAll(users);
+        this.users = users;
+    }
+
+    public List<User> getUsers() {
+        return users;
     }
 
     public void removeUser(User user) {
-        for (final User oneUser : users) {
-            if (oneUser.getName().equals(user.getName())) users.remove(user);
-        }
+        users.removeIf(oneUser -> oneUser.getName().equals(user.getName()));
     }
 }

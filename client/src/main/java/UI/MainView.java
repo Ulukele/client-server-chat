@@ -24,6 +24,7 @@ public class MainView extends JFrame implements ISubscriber {
     private final ChatTextField chatTextField;
     private final SendMessageButton sendMessageButton;
     private final StateLabel stateLabel;
+    private final ParticipantsPanel participantsPanel;
 
 
     public MainView(ClientConfiguration configuration) {
@@ -37,6 +38,7 @@ public class MainView extends JFrame implements ISubscriber {
         chatTextField = new ChatTextField(configuration);
         sendMessageButton = new SendMessageButton(chatTextField);
         stateLabel = new StateLabel();
+        participantsPanel = new ParticipantsPanel(configuration);
 
         setupLayout();
     }
@@ -60,9 +62,15 @@ public class MainView extends JFrame implements ISubscriber {
         stateLabel.setForeground(appColor.brighter());
         stateLabel.setMinimumSize(new Dimension(400, 20));
 
+        participantsPanel.setMinimumSize(new Dimension(200, 700));
+        participantsPanel.setupLayout();
+
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                        .addComponent(chatPanel)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(chatPanel)
+                                .addComponent(participantsPanel)
+                        )
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(chatTextField)
                                 .addComponent(sendMessageButton)
@@ -71,7 +79,10 @@ public class MainView extends JFrame implements ISubscriber {
         );
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addComponent(chatPanel)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(chatPanel)
+                                .addComponent(participantsPanel)
+                        )
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(chatTextField)
                                 .addComponent(sendMessageButton)
@@ -98,6 +109,7 @@ public class MainView extends JFrame implements ISubscriber {
     public void connectModels(Model<Chat> chatModel, Model<ParticipantState> participantStateModel, Model<String> stringModel) {
         chatPanel.addModel(chatModel);
         stateLabel.addModel(participantStateModel);
+        participantsPanel.addModel(chatModel);
         addModel(stringModel);
     }
 

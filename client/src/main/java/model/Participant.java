@@ -48,6 +48,7 @@ public class Participant extends Publisher implements Model<Chat> {
             client = new Client(eventsManager);
             client.connect(address);
             client.send(requestBuilder.buildConnect(user));
+            client.send(requestBuilder.buildRequestUsers());
         } catch (IOException ioException) {
             throw new ConnectionException("Unable to connect to such host");
         }

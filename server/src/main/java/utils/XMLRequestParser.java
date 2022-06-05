@@ -8,10 +8,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import requests.IRequest;
-import requests.LoginRequest;
-import requests.LogoutRequest;
-import requests.MessageRequest;
+import requests.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -79,7 +76,7 @@ public class XMLRequestParser implements IRequestParser {
             if (sessionId == null || messageText == null) throw new RequestParsingException();
             return new MessageRequest(sessionId, messageText);
         } else if (name.equals("list")) {
-            return null; // TODO return request
+            return new UsersListRequest(sessionId);
         } else {
             throw new RequestParsingException();
         }

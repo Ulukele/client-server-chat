@@ -19,7 +19,7 @@ public class Server {
     private final boolean logging;
     private final int maxClients;
     private final int maxMessages;
-    private int clientsCount;
+    private int lastSessionId;
     private final IEventBuilder eventBuilder;
     private final Map<Integer, RequestProcessor> requestProcessorMap = new HashMap<>();
     private final Logger logger = Logger.getLogger(Server.class.getName());
@@ -36,7 +36,7 @@ public class Server {
         this.logging = configuration.isLog();
         this.maxClients = configuration.getMaxClients();
         this.maxMessages = configuration.getMaxMessages();
-        this.clientsCount = 0;
+        this.lastSessionId = 0;
         this.eventBuilder = eventBuilder;
         messageQueue = new ArrayDeque<>(maxMessages);
 
@@ -62,8 +62,8 @@ public class Server {
         while (true) {
             Socket clientSocket = serverSocket.accept();
             logInfo("Accept");
-            clientsCount++;
-            int sessionId = clientsCount;
+            int sessionId = lastSessionId;
+            lastSessionId++;
             IRequestParser requestParser = new XMLRequestParser();
             requestParser.setSessionId(sessionId);
             RequestProcessor requestProcessor = new RequestProcessor(
@@ -71,7 +71,7 @@ public class Server {
                     clientSocket,
                     requestParser,
                     new ResponseExecutor(this),
-                    60L
+                    600L
             );
             requestProcessorMap.put(sessionId, requestProcessor);
             requestProcessor.startResponse();
@@ -99,6 +99,16 @@ public class Server {
         } catch (InterruptedException e) {
             logInfo(e.getMessage());
         }
+    }
+
+    public void sendUsersList(int sessionId) {
+        List<User> userList = new ArrayList<>();
+        for (final int session : requestProcessorMap.keySet()) {
+            userList.add(requestProcessorMap.get(session).getUser());
+        }
+        byte[] event = eventBuilder.buildListUsers(userList);
+        sendForSession(sessionId, event);
+        logInfo("Send users list to sessionID=" + sessionId);
     }
 
     public void addUser(int sessionId, User user) {

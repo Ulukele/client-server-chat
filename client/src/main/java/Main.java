@@ -14,7 +14,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 public class Main {
     public static void main(String[] args) {
-
         ParticipantStateManager participantStateManager = new ParticipantStateManager();
         NotificationsManager notificationsManager = new NotificationsManager();
         XMLRequestsBuilder requestsBuilder = new XMLRequestsBuilder();
