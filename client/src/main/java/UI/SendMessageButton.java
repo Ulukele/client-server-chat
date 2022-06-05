@@ -17,7 +17,9 @@ public class SendMessageButton extends JButton {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (control == null) return;
-                control.execute(new SendMessageCommand(textField.getText()));
+                String messageText = textField.getText();
+                textField.setText("");
+                control.execute(new SendMessageCommand(messageText));
             }
         });
     }

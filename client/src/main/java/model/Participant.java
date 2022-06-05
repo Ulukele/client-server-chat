@@ -32,16 +32,18 @@ public class Participant extends Publisher implements Model<Chat> {
         eventsManager = new EventsManager(eventsParser, new Control(this));
     }
 
-    public void closeCurrentConnection() throws IOException {
+    public void closeCurrentConnection() {
         if (stateManager.getParticipantState() != ParticipantState.CONNECTED) return;
-        client.send(requestBuilder.buildDisconnect());
-        stateManager.setParticipantState(ParticipantState.WAITS_ADDRESS);
+        try {
+            client.send(requestBuilder.buildDisconnect());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void makeConnection(Address address, String userName) throws ConnectionException {
         user = new User(userName);
         chat = new Chat();
-
         try {
             client = new Client(eventsManager);
             client.connect(address);
@@ -65,7 +67,6 @@ public class Participant extends Publisher implements Model<Chat> {
         } catch (IOException exception) {
             notificationsManager.addNotification("Error while sending message");
         }
-        publishNotify();
     }
 
     public void addUser(User newUser) {
@@ -94,10 +95,6 @@ public class Participant extends Publisher implements Model<Chat> {
         this.sessionId = sessionId;
         stateManager.setParticipantState(ParticipantState.CONNECTED);
         requestBuilder.setSessionId(sessionId);
-    }
-
-    public NotificationsManager getNotificationsData() {
-        return notificationsManager;
     }
 
     @Override

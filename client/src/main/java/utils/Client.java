@@ -28,15 +28,15 @@ public class Client {
         inputStream = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
         datagramReader.setInputStream(inputStream);
         outputStream = new DataOutputStream(socket.getOutputStream());
-
         // Processing events from server
-        eventLoop.shutdown();
         eventLoop.submit(new Runnable() {
             @Override
             public void run() {
                 while (true) {
                     try {
-                        if (!datagramReader.haveData()) continue;
+                        if (!datagramReader.haveData()) {
+                            continue;
+                        }
                         byte[] datagram = datagramReader.readOne();
                         eventsManager.handle(datagram);
                     } catch (IOException ioException) {

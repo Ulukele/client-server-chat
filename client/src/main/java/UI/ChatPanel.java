@@ -3,27 +3,42 @@ package UI;
 import common.*;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import java.awt.*;
-import java.util.ArrayDeque;
 import java.util.List;
-import java.util.Queue;
 
-public class ChatPanel extends JPanel implements ISubscriber {
+public class ChatPanel extends JScrollPane implements ISubscriber {
 
     private final ClientConfiguration configuration;
 
-//    private final Queue<MessagePanel> messagePanels = new ArrayDeque<>();
-    private final int maxMessages;
     private Model<Chat> chatModel;
+    private final JTextPane chatPane;
+    private final StyledDocument chatDocument;
+
+    private SimpleAttributeSet senderSet;
+    private SimpleAttributeSet textSet;
 
     public ChatPanel(ClientConfiguration configuration) {
         this.configuration = configuration;
-        this.maxMessages = configuration.getMaxMessagesToDisplay();
+        this.chatPane = new JTextPane();
+        chatPane.setEditable(false);
+        this.chatDocument = chatPane.getStyledDocument();
+        setViewportView(chatPane);
     }
 
     public void setupLayout() {
         setBackground(configuration.getAppBgColor());
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        chatPane.setBackground(configuration.getAppBgColor());
+
+        senderSet = new SimpleAttributeSet();
+        StyleConstants.setFontSize(senderSet, 17);
+        StyleConstants.setForeground(senderSet, configuration.getAppMessageColor().darker());
+        textSet = new SimpleAttributeSet();
+        StyleConstants.setFontSize(textSet, 17);
+        StyleConstants.setForeground(textSet, configuration.getAppMessageColor());
     }
 
     public void addModel(Model<Chat> chatModel) {
@@ -31,28 +46,21 @@ public class ChatPanel extends JPanel implements ISubscriber {
         chatModel.addSubscriber(this);
     }
 
-    public void addMessage(MessagePanel messagePanel) {
-        Color appColor = configuration.getAppBgColor();
-        messagePanel.setBackground(appColor.brighter());
-        messagePanel.getUser().setForeground(appColor.darker().darker());
-        messagePanel.getText().setForeground(appColor.darker());
-
-        add(messagePanel);
-//        if (messagePanels.size() >= maxMessages) {
-//            MessagePanel lastMessage = messagePanels.poll();
-//            remove(lastMessage);
-//        }
-//        messagePanels.add(messagePanel);
+    public void addMessage(Message message) {
+        try {
+            chatDocument.insertString(chatDocument.getLength(), message.getSender().getName() + "\n", senderSet);
+            chatDocument.insertString(chatDocument.getLength(), message.getText() + "\n\n", textSet);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void reactOnNotify() {
         Chat chat = chatModel.getData();
-        removeAll();
-        List<Message> messages = chat.getMessages().subList(0, maxMessages);
-
-        for (final Message message : messages) {
-            addMessage(new MessagePanel(message.getText(), message.getSender().getName()));
-        }
+        List<Message> messages = chat.getMessages();
+        if (messages.size() <= 0) return;
+        addMessage(messages.get(messages.size() - 1));
+        updateUI();
     }
 }

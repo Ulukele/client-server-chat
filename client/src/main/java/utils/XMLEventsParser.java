@@ -56,27 +56,19 @@ public class XMLEventsParser implements IEventsParser {
         return new Message(new User(name), message);
     }
 
-    private ICommand parseServerEvent(Element root) throws DataParsingException {
-        NodeList eventList = root.getElementsByTagName("event");
-        if (eventList.getLength() != 1) throw new DataParsingException();
-
-        Node eventNode = eventList.item(0);
-        if (eventNode.getNodeType() != Node.ELEMENT_NODE) throw new DataParsingException();
-
-        Element eventElement = (Element) eventNode;
-        String name = eventElement.getAttribute("name");
-
+    private ICommand parseServerEvent(Element event) throws DataParsingException {
+        String name = event.getAttribute("name");
         ICommand command = null;
         if (name.equals("user-login")) {
-            User user = parseUserFromEvent(eventElement);
+            User user = parseUserFromEvent(event);
             if (user == null) throw new DataParsingException();
             command = new AddUsersCommand(user);
         } else if (name.equals("user-logout")) {
-            User user = parseUserFromEvent(eventElement);
+            User user = parseUserFromEvent(event);
             if (user == null) throw new DataParsingException();
             command = new RemoveUserCommand(user);
         } else if (name.equals("message")) {
-            Message message = parseMessageFromEvent(eventElement);
+            Message message = parseMessageFromEvent(event);
             if (message == null) throw new DataParsingException();
             command = new MessageCommand(message);
         } else {

@@ -86,6 +86,8 @@ public class MainView extends JFrame implements ISubscriber {
         this.control = control;
         sendMessageButton.connectControl(control);
         stateLabel.connectControl(control);
+
+        addWindowListener(new UIWindowListener(control));
     }
 
     private void addModel(Model<String> stringModel) {

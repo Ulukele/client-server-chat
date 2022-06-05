@@ -6,7 +6,7 @@ import java.awt.*;
 import java.io.IOException;
 
 public class ClientConfiguration {
-    private int maxMessagesToDisplay;
+    private Color appMessageColor;
     private Color appBgColor;
 
     private final String filename;
@@ -30,29 +30,33 @@ public class ClientConfiguration {
     }
 
     private void configureFromDefaults() {
-        maxMessagesToDisplay = 10;
         appBgColor = new Color(70, 70, 120);
+        appMessageColor = new Color(255, 200, 200);
     }
 
     private void configureFromProperties() throws LoadConfigurationException {
         try {
-            maxMessagesToDisplay = propertiesParser.getInteger("MAX_MESSAGES_TO_DISPLAY");
 
             int appBgColorR = propertiesParser.getInteger("APP_BG_COLOR_R");
             int appBgColorG = propertiesParser.getInteger("APP_BG_COLOR_G");
             int appBgColorB = propertiesParser.getInteger("APP_BG_COLOR_B");
             appBgColor = new Color(appBgColorR, appBgColorG, appBgColorB);
+
+            int appMessageColorR = propertiesParser.getInteger("APP_MESSAGE_COLOR_R");
+            int appMessageColorG = propertiesParser.getInteger("APP_MESSAGE_COLOR_G");
+            int appMessageColorB = propertiesParser.getInteger("APP_MESSAGE_COLOR_B");
+            appMessageColor = new Color(appMessageColorR, appMessageColorG, appMessageColorB);
         } catch (NullPointerException | NumberFormatException exception) {
             configureFromDefaults();
             throw new LoadConfigurationException("Unable to parse configuration file, use defaults");
         }
     }
 
-    public int getMaxMessagesToDisplay() {
-        return maxMessagesToDisplay;
-    }
-
     public Color getAppBgColor() {
         return appBgColor;
+    }
+
+    public Color getAppMessageColor() {
+        return appMessageColor;
     }
 }

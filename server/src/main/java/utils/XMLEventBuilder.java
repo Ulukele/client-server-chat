@@ -40,13 +40,19 @@ public class XMLEventBuilder implements IEventBuilder {
 
     @Override
     public byte[] buildSuccess(String message) {
-        String event = "<error><message>" + message + "</message></error>";
+        String event = "<success><message>" + message + "</message></success>";
         return event.getBytes();
     }
 
     @Override
     public byte[] buildError(String message) {
-        String event = "<success><message>" + message + "</message></success>";
+        String event = "<error><message>" + message + "</message></error>";
+        return event.getBytes();
+    }
+
+    @Override
+    public byte[] buildSuccessLogin(int sessionId) {
+        String event = "<success><session>" + sessionId + "</session></success>";
         return event.getBytes();
     }
 }

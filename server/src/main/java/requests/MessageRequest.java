@@ -1,17 +1,18 @@
 package requests;
 
 import common.Message;
-import requests.IRequest;
 import server.Server;
 
 public class MessageRequest implements IRequest {
-    private final Message message;
-    public MessageRequest(Message message) {
-        this.message = message;
+    private final int sessionId;
+    private final String text;
+    public MessageRequest(int sessionId, String text) {
+        this.sessionId = sessionId;
+        this.text = text;
     }
 
     @Override
     public void react(Server server) {
-        // TODO react
+        server.addMessageFromSession(sessionId, text);
     }
 }

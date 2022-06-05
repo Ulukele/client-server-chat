@@ -11,7 +11,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Queue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.SynchronousQueue;
 
 public class RequestProcessor {
@@ -21,10 +22,12 @@ public class RequestProcessor {
     private final int sessionId;
     private final Socket clientSocket;
     private final IRequestParser requestParser;
-    private final Queue<byte[]> eventsQueue = new SynchronousQueue<>();
+    private final SynchronousQueue<byte[]> eventsQueue = new SynchronousQueue<>();
     private final ResponseExecutor responseExecutor;
 
-    private Thread requestThread;
+    private DataOutputStream outputStream;
+
+    private final ExecutorService pool = Executors.newFixedThreadPool(2);
 
     public RequestProcessor(
             int sessionId,
@@ -40,7 +43,6 @@ public class RequestProcessor {
 
     public void startResponse() {
         DataInputStream inputStream;
-        DataOutputStream outputStream;
         try {
             inputStream = new DataInputStream(new BufferedInputStream(clientSocket.getInputStream()));
             outputStream = new DataOutputStream(clientSocket.getOutputStream());
@@ -51,27 +53,46 @@ public class RequestProcessor {
         DatagramReader datagramReader = new DatagramReader();
         datagramReader.setInputStream(inputStream);
 
-        requestThread = new Thread(() -> {
+        pool.submit(() -> {
             while (true) {
                 try {
-                    if (!eventsQueue.isEmpty()) {
-                        byte[] event = eventsQueue.poll();
-                        outputStream.write(event);
-                    }
                     if (!datagramReader.haveData()) continue;
                     byte[] datagram = datagramReader.readOne();
                     IRequest request = requestParser.parseRequest(datagram);
                     responseExecutor.execute(request);
-                } catch (IOException | RequestParsingException e) {
+                } catch (IOException e) {
+                    closeConnection();
+                } catch (RequestParsingException e) {
                     e.printStackTrace();
                 }
             }
         });
-        requestThread.start();
+
+        pool.submit(() -> {
+           while (true) {
+               try {
+                   byte[] event = eventsQueue.take();
+                   send(event);
+               } catch (IOException e) {
+                   e.printStackTrace();
+               } catch (InterruptedException e) {
+                    break;
+               }
+           }
+        });
     }
 
-    public void addEvent(byte[] event) {
-        eventsQueue.add(event);
+    public void closeConnection() {
+        pool.shutdown();
+    }
+
+    private void send(byte[] data) throws IOException {
+        outputStream.writeInt(data.length);
+        outputStream.write(data);
+    }
+
+    public void addEvent(byte[] event) throws InterruptedException {
+        eventsQueue.put(event);
     }
 
     public void setUser(User user) {

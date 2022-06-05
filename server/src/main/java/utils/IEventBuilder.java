@@ -12,4 +12,5 @@ public interface IEventBuilder {
     byte[] buildListUsers(List<User> users);
     byte[] buildSuccess(String message);
     byte[] buildError(String message);
+    byte[] buildSuccessLogin(int sessionId);
 }

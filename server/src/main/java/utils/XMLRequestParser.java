@@ -28,6 +28,7 @@ public class XMLRequestParser implements IRequestParser {
         documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
     }
 
+    @Override
     public void setSessionId(int sessionId) {
         this.sessionId = sessionId;
     }
@@ -73,11 +74,10 @@ public class XMLRequestParser implements IRequestParser {
             if (sessionId == null) throw new RequestParsingException();
             return new LogoutRequest(sessionId);
         } else if (name.equals("message")) {
-            String userName = parseUserName(root);
+            Integer sessionId = parseSessionId(root);
             String messageText = parseMessageText(root);
-            if (userName == null || messageText == null) throw new RequestParsingException();
-            Message message = new Message(new User(userName), messageText);
-            return new MessageRequest(message);
+            if (sessionId == null || messageText == null) throw new RequestParsingException();
+            return new MessageRequest(sessionId, messageText);
         } else if (name.equals("list")) {
             return null; // TODO return request
         } else {

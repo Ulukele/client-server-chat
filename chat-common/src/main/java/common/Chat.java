@@ -1,15 +1,16 @@
 package common;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Chat {
-    private List<User> users;
+    private final List<User> users = new ArrayList<>();
+
+    private final List<Message> messages = new ArrayList<>();
 
     public List<Message> getMessages() {
         return messages;
     }
-
-    private List<Message> messages;
 
     public void addMessage(Message message) {
         messages.add(message);

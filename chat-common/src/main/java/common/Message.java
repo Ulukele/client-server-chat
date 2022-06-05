@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 public class Message {
     private User sender;
     private String text;
-    private LocalDateTime dateTime;
 
     public Message(User sender, String text) {
         this.sender = sender;
@@ -28,11 +27,15 @@ public class Message {
         this.text = text;
     }
 
-    public LocalDateTime getDateTime() {
-        return dateTime;
+    public boolean isEmpty() {
+        return text.isEmpty();
     }
 
-    public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
+    @Override
+    public String toString() {
+        return "Message{" +
+                "sender=" + sender +
+                ", text='" + text + '\'' +
+                '}';
     }
 }
